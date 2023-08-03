@@ -1,0 +1,11 @@
+FROM golang:1.19 AS build-stage
+WORKDIR /app
+COPY ./ ./
+RUN go mod tidy
+RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping
+
+FROM alpine AS build-release-stage
+WORKDIR /
+COPY --from=build-stage /docker-gs-ping /docker-gs-ping
+EXPOSE 8080
+ENTRYPOINT ["/docker-gs-ping"]
